@@ -10,6 +10,9 @@ MOVE_RIGHT = (1, 0)
 
 
 def is_free_to_move(map, move):
+    x, y = move
+    return map[y][x]==None
+
     """
     Check whether a target position is empty and can be moved into.
 
@@ -25,9 +28,21 @@ def is_free_to_move(map, move):
 
 
 def is_valid_move(map, move):
+    max_rows = len(map)
+    max_columns = len(map[0])
+    x, y=move
+
+    if(x<0 or y<0):
+        return False
+    elif(x>max_columns-1):
+        return False
+    elif(y>max_rows-1):
+        return False
+    else:
+        return True
+    
     """
     Check whether a position is inside the matrix boundaries.
-
     Args:
         map: Matrix (list of lists) representing the board.
         move: Position as (x, y), where x is horizontal and y is vertical.
