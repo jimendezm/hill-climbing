@@ -1,3 +1,5 @@
+import copy
+
 OBJECT_EMPTY = None
 OBJECT_HOUSE = "🏠"
 OBJECT_HOSPITAL = "🏥"
@@ -28,15 +30,11 @@ def is_free_to_move(map, move):
 
 
 def is_valid_move(map, move):
-    max_rows = len(map)
-    max_columns = len(map[0])
+    max_rows = len(map)-1
+    max_columns = len(map[0])-1
     x, y=move
 
-    if(x<0 or y<0):
-        return False
-    elif(x>max_columns-1):
-        return False
-    elif(y>max_rows-1):
+    if(x<0 or y<0 or x>max_columns or y>max_rows):
         return False
     else:
         return True
@@ -55,6 +53,12 @@ def is_valid_move(map, move):
 
 
 def find_objects(map, target_object_symbol):
+    list=[]
+    for i,row in  enumerate(map):
+        for j, object in enumerate(row):
+            if(object==target_object_symbol):
+                list+=[(j,i)]
+    return list
     """
     Find all coordinates where a given object symbol appears.
 
@@ -70,6 +74,12 @@ def find_objects(map, target_object_symbol):
 
 
 def result(map, hospital_coordinates, target_move):
+    x,y=target_move
+    xh, yh= hospital_coordinates
+    new_map= copy.deepcopy(map)
+    new_map[y][x]= OBJECT_HOSPITAL
+    new_map[yh][xh]= None
+    return new_map
     """
     Create and return a new map after moving one hospital to a target position.
 
@@ -86,6 +96,10 @@ def result(map, hospital_coordinates, target_move):
 
 
 def manhattan(pos, pos_2):
+    x1,y1=pos
+    x2,y2=pos_2
+
+    return abs(x2 - x1) + abs(y2 - y1)
     """
     Compute the Manhattan distance between two coordinates.
 
@@ -101,6 +115,15 @@ def manhattan(pos, pos_2):
 
 
 def cost(map):
+    manhattan_dis=0
+    houses_coord=find_objects(map,OBJECT_HOUSE)
+    hospital_coord=find_objects(map,OBJECT_HOSPITAL)
+
+    for house in houses_coord:
+        for hospital in hospital_coord:
+            manhattan_dis+= manhattan(house,hospital)
+
+    return manhattan_dis
     """
     Compute total cost as the sum of distances from each hospital to each house.
 
@@ -115,6 +138,9 @@ def cost(map):
 
 
 def move(pos, pos_2):
+    x1,y1=pos
+    x2,y2=pos_2
+    return (x1 + x2, y1 + y2)
     """
     Add two coordinates component-wise.
 
@@ -130,6 +156,15 @@ def move(pos, pos_2):
 
 
 def actions(map, hospital_position):
+    x,y=hospital_position
+    valid_pos=[]
+    possible_positions=[(x,y-1),(x,y+1),(x-1,y),(x+1,y)]
+    for position in possible_positions:
+        if is_valid_move(map,position):
+            if is_free_to_move(map,position):
+                valid_pos+=[position]
+    return valid_pos
+
     """
     Return all valid adjacent moves for a hospital in up, down, left, right order.
 
