@@ -1,5 +1,5 @@
 import utils
-
+import math
 
 def hill_climbing(map):
     current_map = map
@@ -66,10 +66,10 @@ def hill_climbing(map):
     """
 
     raise NotImplementedError("hill_climbing is not implemented yet")
-import utils
 
 
 def simulated_annealing(grid, T_min, T_initial, cooling_rate):
+
     """
     Optimize hospital positions using simulated annealing by exploring random moves
     and occasionally accepting worse states to escape local optima.
@@ -83,6 +83,32 @@ def simulated_annealing(grid, T_min, T_initial, cooling_rate):
     Returns:
         list[list]: A grid configuration produced by the annealing search.
     """
+    current_map = grid
+    current_cost = utils.cost(current_map)
+
+    while T_initial>T_min:
+        movable_hospitals=utils.find_objects(grid, utils.OBJECT_HOSPITAL)
+
+        if movable_hospitals==[]:
+            break
+        for hospital in movable_hospitals:
+            for candidate_move in utils.actions(grid, hospital):
+                candidate_map = utils.result(grid, hospital, candidate_move)
+                candidate_cost = utils.cost(candidate_map)
+                cost_difference=candidate_cost-current_cost
+
+                if candidate_cost < best_cost:
+                    best_map = candidate_map
+                    best_cost = candidate_cost
+        if best_cost < current_cost:
+            current_map = best_map
+            current_cost = best_cost
+        else:
+            acceptance_probability= math.e * math.exp()
+
+    return current_map
+        
+
 
     # current grid <- grid
     # current cost <- cost of the grid
