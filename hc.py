@@ -1,5 +1,6 @@
 import utils
 import math
+import random
 
 def hill_climbing(map):
     current_map = map
@@ -85,27 +86,35 @@ def simulated_annealing(grid, T_min, T_initial, cooling_rate):
     """
     current_map = grid
     current_cost = utils.cost(current_map)
-
-    while T_initial>T_min:
-        movable_hospitals=utils.find_objects(grid, utils.OBJECT_HOSPITAL)
-
-        if movable_hospitals==[]:
+    temperature = T_initial
+ 
+    while temperature > T_min:
+        movable_hospitals = utils.find_objects(current_map, utils.OBJECT_HOSPITAL)
+ 
+        if movable_hospitals == []:
             break
-        for hospital in movable_hospitals:
-            for candidate_move in utils.actions(grid, hospital):
-                candidate_map = utils.result(grid, hospital, candidate_move)
-                candidate_cost = utils.cost(candidate_map)
-                cost_difference=candidate_cost-current_cost
-
-                if candidate_cost < best_cost:
-                    best_map = candidate_map
-                    best_cost = candidate_cost
-        if best_cost < current_cost:
-            current_map = best_map
-            current_cost = best_cost
+        
+        selected_hospital = random.choice(movable_hospitals)
+        possible_moves = utils.actions(current_map, selected_hospital)
+        if not possible_moves:
+            break
+        selected_move = random.choice(possible_moves)
+        selected_move = random.choice(possible_moves)
+        neighbor_map = utils.result(current_map, selected_hospital, selected_move)
+        neighbor_cost = utils.cost(neighbor_map)
+        cost_difference = neighbor_cost - current_cost
+ 
+        if cost_difference < 0:
+            current_map = neighbor_map
+            current_cost = neighbor_cost
         else:
-            acceptance_probability= math.e * math.exp()
-
+            acceptance_probability = math.exp(-cost_difference / temperature)
+            if random.random() < acceptance_probability:
+                current_map = neighbor_map
+                current_cost = neighbor_cost
+ 
+        temperature *= cooling_rate
+ 
     return current_map
         
 
